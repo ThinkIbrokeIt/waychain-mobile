@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "WayChain Mobile",
+    "slug": "waychain-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "runtimeVersion": "1.0.0",
+    "sdkVersion": "53.0.0",
+    "platforms": ["android", "ios", "web"],
+    "android": {
+      "package": "org.waychain.mobile",
+      "versionCode": 1
+    },
+    "ios": {
+      "bundleIdentifier": "org.waychain.mobile"
+    }
+  }
+}
