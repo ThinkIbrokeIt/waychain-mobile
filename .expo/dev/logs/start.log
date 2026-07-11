@@ -1,0 +1,27 @@
+{"_e":"root:init","_t":1783659317502,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783659317503,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783659317508,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783659317998,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783659320990,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1783659322005,"plugins":[]}
+{"_e":"metro:instantiate","_t":1783659323493,"atlas":false,"workers":1,"host":"::","port":8081}
+{"_e":"metro:server_log","_t":1783659334592,"level":"error","data":["An unknown error occurred while installing React Native DevTools. Details:\n\n[781691:0709/235532.111591:FATAL:sandbox/linux/suid/client/setuid_sandbox_host.cc:166] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/wink/.cache/dotslash/64/ed7915e5fef86802e862c274e17f780fa75388/React Native DevTools-linux-x64/chrome-sandbox is owned by root and has mode 4755.\n"]}
+{"_e":"root:init","_t":1783659590156,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783659590157,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783659590160,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783659741619,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783659741620,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783659741630,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783659742658,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783659744882,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1783659746098,"plugins":[]}
+{"_e":"metro:instantiate","_t":1783659746924,"atlas":false,"workers":1,"host":"::","port":8081}
+{"_e":"metro:server_log","_t":1783659751922,"level":"error","data":["An unknown error occurred while installing React Native DevTools. Details:\n\n[784247:0710/000226.182320:FATAL:sandbox/linux/suid/client/setuid_sandbox_host.cc:166] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/wink/.cache/dotslash/64/ed7915e5fef86802e862c274e17f780fa75388/React Native DevTools-linux-x64/chrome-sandbox is owned by root and has mode 4755.\n"]}
+{"_e":"root:init","_t":1783659845227,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783659845229,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783659845233,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783659845574,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783659846157,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1783659846546,"plugins":[]}
+{"_e":"metro:instantiate","_t":1783659847191,"atlas":false,"workers":1,"host":"::","port":8081}
+{"_e":"metro:server_log","_t":1783659847993,"level":"error","data":["An unknown error occurred while installing React Native DevTools. Details:\n\n[785143:0710/000406.588473:FATAL:sandbox/linux/suid/client/setuid_sandbox_host.cc:166] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/wink/.cache/dotslash/64/ed7915e5fef86802e862c274e17f780fa75388/React Native DevTools-linux-x64/chrome-sandbox is owned by root and has mode 4755.\n"]}
