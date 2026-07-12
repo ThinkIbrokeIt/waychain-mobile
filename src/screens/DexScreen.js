@@ -1,57 +1,48 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { waychainRPC } from '../services/rpc';
+import { View, Text, StyleSheet, TextInput, Alert, ScrollView } from 'react-native';
+import { COLORS, FONTS } from '../theme';
+import BrandHeader from '../components/BrandHeader';
+import Button from '../components/Button';
 
-export default function DexScreen({ navigation }) {
+export default function DexScreen() {
   const [tokenA, setTokenA] = useState('');
   const [tokenB, setTokenB] = useState('');
   const [amountA, setAmountA] = useState('');
   const [amountB, setAmountB] = useState('');
 
-  const createPair = async () => {
-    if (!tokenA || !tokenB) {
-      Alert.alert('Error', 'Enter both tokens');
-      return;
-    }
-    // Would call SwapRoute precompile 0x25
-    Alert.alert('Pair Created', `${tokenA}/${tokenB} pair ready`);
+  const createPair = () => {
+    if (!tokenA || !tokenB) { Alert.alert('Error', 'Enter both tokens'); return; }
+    Alert.alert('Pair Created', `${tokenA}/${tokenB} pair ready (SwapRoute 0x25)`);
   };
 
-  const addLiquidity = async () => {
-    // Would call SwapRoute.addLiquidity (0x25)
+  const addLiquidity = () => {
     Alert.alert('Liquidity Added', `${amountA} + ${amountB}`);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>SwapRoute DEX</Text>
-      
+    <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+      <BrandHeader subtitle="SwapRoute DEX" />
       <View style={styles.section}>
-        <Text style={styles.label}>Create Pair</Text>
-        <TextInput placeholder="Token A" value={tokenA} onChangeText={setTokenA} style={styles.input} />
-        <TextInput placeholder="Token B" value={tokenB} onChangeText={setTokenB} style={styles.input} />
-        <TouchableOpacity style={styles.btn} onPress={createPair}>
-          <Text>Create Pair</Text>
-        </TouchableOpacity>
+        <Text style={styles.sectionTitle}>Create Pair</Text>
+        <TextInput placeholder="Token A" value={tokenA} onChangeText={setTokenA} style={styles.input} placeholderTextColor={COLORS.muted} />
+        <TextInput placeholder="Token B" value={tokenB} onChangeText={setTokenB} style={styles.input} placeholderTextColor={COLORS.muted} />
+        <Button label="Create Pair" onPress={createPair} style={styles.btn} />
       </View>
-
       <View style={styles.section}>
-        <Text style={styles.label}>Add Liquidity</Text>
-        <TextInput placeholder="Amount A" value={amountA} onChangeText={setAmountA} style={styles.input} />
-        <TextInput placeholder="Amount B" value={amountB} onChangeText={setAmountB} style={styles.input} />
-        <TouchableOpacity style={styles.btn} onPress={addLiquidity}>
-          <Text>Add Liquidity</Text>
-        </TouchableOpacity>
+        <Text style={styles.sectionTitle}>Add Liquidity</Text>
+        <TextInput placeholder="Amount A" value={amountA} onChangeText={setAmountA} style={styles.input} placeholderTextColor={COLORS.muted} />
+        <TextInput placeholder="Amount B" value={amountB} onChangeText={setAmountB} style={styles.input} placeholderTextColor={COLORS.muted} />
+        <Button label="Add Liquidity" onPress={addLiquidity} variant="secondary" style={styles.btn} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#1a1a1a' },
-  title: { fontSize: 24, color: '#FFBF00', marginBottom: 20, textAlign: 'center' },
-  section: { marginBottom: 30 },
-  label: { color: '#fff', marginBottom: 10, fontSize: 16 },
-  input: { backgroundColor: '#333', color: '#fff', padding: 10, marginBottom: 10, borderRadius: 4 },
-  btn: { backgroundColor: '#B87333', padding: 12, borderRadius: 6, alignItems: 'center' }
+  screen: { flex: 1, backgroundColor: COLORS.parchment },
+  container: { flexGrow: 1, paddingBottom: 32 },
+  section: { marginHorizontal: 20, marginTop: 20 },
+  sectionTitle: { fontFamily: FONTS.display, fontSize: 20, color: COLORS.charcoal, marginBottom: 12 },
+  input: { backgroundColor: COLORS.card, color: COLORS.charcoal, padding: 14, marginBottom: 12, borderRadius: 10, borderWidth: 1, borderColor: COLORS.border },
+  btn: { marginTop: 4 },
 });

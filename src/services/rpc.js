@@ -1,10 +1,13 @@
 // WayChain RPC service - connects to native chain
+import * as Crypto from 'expo-crypto';
+
 const RPC_URL = 'https://api.waychain.org';
 
 // Precompile addresses (hex, 40-char padded)
 const PRECOMPILES = {
   BIJO: '0x0000000000000000000000000000000000000014',
   WAY:  '0x0000000000000000000000000000000000000003',
+  WIFR: '0x0000000000000000000000000000000000000021',
 };
 
 // ABI selectors (first 4 bytes of sha256 — WayChain uses SHA256, not keccak256)
@@ -24,7 +27,7 @@ export const waychainRPC = {
   },
 
   getBalance: async (address, token = 'WAY') => {
-    const precompile = token === 'WAY' ? PRECOMPILES.WAY : PRECOMPILES.BIJO;
+    const precompile = token === 'WAY' ? PRECOMPILES.WAY : token === 'WIFR' ? PRECOMPILES.WIFR : PRECOMPILES.BIJO;
     const addrHex = address.replace(/^0x/, '').toLowerCase().padStart(64, '0');
     const data = SELECTORS.balanceOf + addrHex;
     return waychainRPC.call('eth_call', [{ to: precompile, data }, 'latest']);
@@ -35,10 +38,9 @@ export const waychainRPC = {
   },
 
   generateKeyPair: async () => {
-    const bytes = new Uint8Array(32);
-    crypto.getRandomValues(bytes);
-    const privateKey = '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-    const words = ['abandon', 'ability', 'able', 'about', 'above', 'absent', 
+    const random = await Crypto.getRandomBytesAsync(32);
+    const privateKey = '0x' + Array.from(random).map(b => b.toString(16).padStart(2, '0')).join('');
+    const words = ['abandon', 'ability', 'able', 'about', 'above', 'absent',
                    'absorb', 'abstract', 'absurd', 'abuse', 'access', 'accident'];
     return { mnemonic: words.join(' '), privateKey };
   }

@@ -1,1 +1,7 @@
-node_modules/\n.expo/\n*.log\ndist/\nweb-build/\nandroid/\nios/
+node_modules/
+.expo/
+*.log
+dist/
+web-build/
+android/
+ios/
