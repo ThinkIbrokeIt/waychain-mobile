@@ -1,44 +1,72 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { COLORS, FONTS } from './theme';
+import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { AppState } from 'react-native';
 import WalletScreen from './screens/WalletScreen';
 import EnergyTideScreen from './screens/EnergyTideScreen';
 import DexScreen from './screens/DexScreen';
 import LocksScreen from './screens/LocksScreen';
+import ReceiveScreen from './screens/ReceiveScreen';
+import SendScreen from './screens/SendScreen';
+import HistoryScreen from './screens/HistoryScreen';
+import AddressBookScreen from './screens/AddressBookScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import AppLock from './components/AppLock';
+import { COLORS } from './theme';
+import { markBackground } from './services/secure';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-const TABS = [
-  { name: 'Wallet', component: WalletScreen, icon: 'wallet', label: 'Wallet' },
-  { name: 'EnergyTide', component: EnergyTideScreen, icon: 'lightbulb-on', label: 'Energy Tide' },
-  { name: 'DEX', component: DexScreen, icon: 'swap-horizontal', label: 'DEX' },
-  { name: 'Locks', component: LocksScreen, icon: 'lock', label: 'Locks' },
-];
+function Tabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: { backgroundColor: COLORS.charcoal, borderTopColor: COLORS.copper },
+        tabBarActiveTintColor: COLORS.amber,
+        tabBarInactiveTintColor: '#888',
+        tabBarLabelStyle: { fontFamily: 'Inter-Regular', fontSize: 11 },
+        tabBarIcon: ({ color, size }) => {
+          const icons = {
+            Wallet: 'wallet',
+            'Energy Tide': 'wave',
+            DEX: 'swap-horizontal',
+            Locks: 'lock',
+          };
+          return <MaterialCommunityIcons name={icons[route.name] || 'circle'} color={color} size={size} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Wallet" component={WalletScreen} />
+      <Tab.Screen name="Energy Tide" component={EnergyTideScreen} />
+      <Tab.Screen name="DEX" component={DexScreen} />
+      <Tab.Screen name="Locks" component={LocksScreen} />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
+  // Auto-lock: record background time so AppLock can gate on return.
+  useEffect(() => {
+    const sub = AppState.addEventListener('background', () => markBackground());
+    return () => sub.remove();
+  }, []);
+
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerStyle: { backgroundColor: COLORS.charcoal },
-          headerTitleStyle: { fontFamily: FONTS.display, color: COLORS.parchment, fontSize: 20 },
-          headerTintColor: COLORS.amber,
-          tabBarStyle: { backgroundColor: COLORS.charcoal, borderTopColor: COLORS.copper },
-          tabBarActiveTintColor: COLORS.amber,
-          tabBarInactiveTintColor: COLORS.muted,
-          tabBarLabelStyle: { fontFamily: FONTS.medium, fontSize: 11 },
-          tabBarIcon: ({ focused, color, size }) => {
-            const t = TABS.find(x => x.name === route.name);
-            return <MaterialCommunityIcons name={t.icon} size={size} color={color} />;
-          },
-        })}
-      >
-        {TABS.map(t => (
-          <Tab.Screen key={t.name} name={t.name} component={t.component} options={{ title: t.label }} />
-        ))}
-      </Tab.Navigator>
-    </NavigationContainer>
+    <AppLock>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Tabs" component={Tabs} />
+          <Stack.Screen name="Receive" component={ReceiveScreen} />
+          <Stack.Screen name="Send" component={SendScreen} />
+          <Stack.Screen name="History" component={HistoryScreen} />
+          <Stack.Screen name="AddressBook" component={AddressBookScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AppLock>
   );
 }
