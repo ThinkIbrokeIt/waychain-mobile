@@ -5,9 +5,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppState } from 'react-native';
 import WalletScreen from './screens/WalletScreen';
-import EnergyTideScreen from './screens/EnergyTideScreen';
-import DexScreen from './screens/DexScreen';
-import LocksScreen from './screens/LocksScreen';
+import StakingScreen from './screens/StakingScreen';
+import BridgeScreen from './screens/BridgeScreen';
+import GovernanceScreen from './screens/GovernanceScreen';
 import ReceiveScreen from './screens/ReceiveScreen';
 import SendScreen from './screens/SendScreen';
 import HistoryScreen from './screens/HistoryScreen';
@@ -32,18 +32,18 @@ function Tabs() {
         tabBarIcon: ({ color, size }) => {
           const icons = {
             Wallet: 'wallet',
-            'Energy Tide': 'wave',
-            DEX: 'swap-horizontal',
-            Locks: 'lock',
+            Stake: 'bank',
+            Bridge: 'bridge',
+            Governance: 'vote',
           };
           return <MaterialCommunityIcons name={icons[route.name] || 'circle'} color={color} size={size} />;
         },
       })}
     >
       <Tab.Screen name="Wallet" component={WalletScreen} />
-      <Tab.Screen name="Energy Tide" component={EnergyTideScreen} />
-      <Tab.Screen name="DEX" component={DexScreen} />
-      <Tab.Screen name="Locks" component={LocksScreen} />
+      <Tab.Screen name="Stake" component={StakingScreen} />
+      <Tab.Screen name="Bridge" component={BridgeScreen} />
+      <Tab.Screen name="Governance" component={GovernanceScreen} />
     </Tab.Navigator>
   );
 }

@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, FONTS } from '../theme';
+import Logo from './Logo';
 
 // Maritime hero header: Wardenclyffe lighthouse mark + brand + copper rule + tagline.
 export default function BrandHeader({ subtitle, tagline }) {
   return (
     <View style={styles.wrap}>
       <View style={styles.mark}>
-        <Image source={require('../../assets/icon.png')} style={styles.logo} resizeMode="contain" />
+        <Logo size={56} />
       </View>
       <Text style={styles.brand}>WAYCHAIN</Text>
       <View style={styles.rule} />
@@ -34,7 +35,6 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.copper, shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  logo: { width: 60, height: 60 },
   brand: {
     fontFamily: FONTS.display,
     fontSize: 32,
