@@ -115,8 +115,8 @@ const styles = StyleSheet.create({
   bookItem: { backgroundColor: COLORS.parchment, borderRadius: 10, padding: 10, marginTop: 6, borderWidth: 1, borderColor: COLORS.border, flexDirection: 'row', justifyContent: 'space-between' },
   bookName: { fontFamily: FONTS.medium, fontSize: 14, color: COLORS.charcoal },
   bookAddr: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.muted },
-  preview: { backgroundColor: '#FFF3E0', borderRadius: 12, padding: 16, marginTop: 18, borderWidth: 1, borderColor: COLORS.amber },
-  previewTitle: { fontFamily: FONTS.display, fontSize: 16, color: '#9C5A24' },
+  preview: { backgroundColor: COLORS.card, borderRadius: 12, padding: 16, marginTop: 18, borderWidth: 1, borderColor: COLORS.amber },
+  previewTitle: { fontFamily: FONTS.display, fontSize: 16, color: COLORS.amber },
   previewRow: { fontFamily: FONTS.body, fontSize: 13, color: COLORS.charcoal, marginTop: 6 },
   btn: { marginTop: 20 },
 });

@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppState } from 'react-native';
 import WalletScreen from './screens/WalletScreen';
+import DEXScreen from './screens/DEXScreen';
 import StakingScreen from './screens/StakingScreen';
 import BridgeScreen from './screens/BridgeScreen';
 import GovernanceScreen from './screens/GovernanceScreen';
@@ -25,13 +26,14 @@ function Tabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor: COLORS.charcoal, borderTopColor: COLORS.copper },
+        tabBarStyle: { backgroundColor: COLORS.card, borderTopColor: COLORS.copper },
         tabBarActiveTintColor: COLORS.amber,
-        tabBarInactiveTintColor: '#888',
+        tabBarInactiveTintColor: '#9A9A9A',
         tabBarLabelStyle: { fontFamily: 'Inter-Regular', fontSize: 11 },
         tabBarIcon: ({ color, size }) => {
           const icons = {
             Wallet: 'wallet',
+            DEX: 'swap-horizontal',
             Stake: 'bank',
             Bridge: 'bridge',
             Governance: 'vote',
@@ -41,6 +43,7 @@ function Tabs() {
       })}
     >
       <Tab.Screen name="Wallet" component={WalletScreen} />
+      <Tab.Screen name="DEX" component={DEXScreen} />
       <Tab.Screen name="Stake" component={StakingScreen} />
       <Tab.Screen name="Bridge" component={BridgeScreen} />
       <Tab.Screen name="Governance" component={GovernanceScreen} />
