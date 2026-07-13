@@ -99,7 +99,7 @@ export async function addAccount(account) {
 export async function createAccount(words = 12) {
   const mnemonic = newMnemonic(words);
   const derived = await deriveFromMnemonic(mnemonic);
-  const account = { ...derived, label: 'Account ' + ((await loadAccounts()).length + 1), createdAt: Date.now() };
+  const account = { ...derived, label: 'Account ' + ((await loadAccounts()).length + 1), createdAt: Date.now(), backedUp: false };
   await addAccount(account);
   return account;
 }
@@ -107,16 +107,30 @@ export async function createAccount(words = 12) {
 export async function importMnemonic(mnemonic) {
   if (!isValidMnemonic(mnemonic)) throw new Error('Invalid recovery phrase');
   const derived = await deriveFromMnemonic(mnemonic);
-  const account = { ...derived, label: 'Account ' + ((await loadAccounts()).length + 1), createdAt: Date.now() };
+  const account = { ...derived, label: 'Account ' + ((await loadAccounts()).length + 1), createdAt: Date.now(), backedUp: true };
   await addAccount(account);
   return account;
 }
 
 export async function importPrivateKey(privateKeyHex) {
   const derived = await deriveFromPrivateKey(privateKeyHex);
-  const account = { ...derived, label: 'Account ' + ((await loadAccounts()).length + 1), createdAt: Date.now() };
+  const account = { ...derived, label: 'Account ' + ((await loadAccounts()).length + 1), createdAt: Date.now(), backedUp: true };
   await addAccount(account);
   return account;
+}
+
+// Mark an account's seed as backed up (user confirmed they saved it).
+export async function markBackedUp(address) {
+  const accounts = await loadAccounts();
+  const next = accounts.map(a => a.address === address ? { ...a, backedUp: true } : a);
+  await saveAccounts(next);
+  return next;
+}
+
+// True only if every account has backedUp === true.
+export async function allBackedUp() {
+  const accounts = await loadAccounts();
+  return accounts.length > 0 && accounts.every(a => a.backedUp);
 }
 
 // Namespace export for convenient import { wallet }
@@ -132,4 +146,6 @@ export const wallet = {
   createAccount,
   importMnemonic,
   importPrivateKey,
+  markBackedUp,
+  allBackedUp,
 };

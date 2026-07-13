@@ -27,6 +27,24 @@ export default function SendScreen({ route, navigation }) {
 
   const send = async () => {
     if (!preview) return;
+    // Validate recipient is a 64-char hex Ed25519 address (strip optional 0x).
+    const toHex = preview.to.replace(/^0x/, '');
+    if (!/^[0-9a-fA-F]{64}$/.test(toHex)) {
+      Alert.alert('Invalid recipient', 'Recipient must be a 64-character WayChain (Ed25519) address.');
+      return;
+    }
+    Alert.alert(
+      'Confirm send',
+      `Send ${preview.amount} WAY to\n${toHex.slice(0, 12)}…${toHex.slice(-8)}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Send', style: 'destructive', onPress: doSend },
+      ]
+    );
+  };
+
+  const doSend = async () => {
+    if (!preview) return;
     setBusy(true);
     try {
       const nonce = await getNonce(account.address);
@@ -39,7 +57,6 @@ export default function SendScreen({ route, navigation }) {
       });
       const txHash = await sendRawTransaction(res.rawHex);
       const finalHash = (txHash || res.txHash);
-      // record to local tx log
       if (route.params?.onSent) {
         route.params.onSent({ to: preview.to, amount: preview.amount, txHash: finalHash, at: Date.now() });
       }
