@@ -6,6 +6,7 @@ import { addTx } from '../services/secure';
 import { COLORS, FONTS } from '../theme';
 import BrandHeader from '../components/BrandHeader';
 import Button from '../components/Button';
+import { formatBalance } from '../utils/format';
 
 export default function WalletScreen({ navigation }) {
   const [accounts, setAccounts] = useState([]);
@@ -29,7 +30,7 @@ export default function WalletScreen({ navigation }) {
   useEffect(() => { load(); }, [load]);
 
   const refreshBalance = useCallback(async (addr) => {
-    try { const bal = await waychainRPC.getBalance(addr); setBalance(bal || '0'); }
+    try { const bal = await waychainRPC.getBalance(addr); setBalance(formatBalance(bal)); }
     catch { setBalance('0'); }
   }, []);
 
@@ -189,18 +190,18 @@ const styles = StyleSheet.create({
   cta: { marginTop: 8 },
   link: { fontFamily: FONTS.medium, fontSize: 15, color: COLORS.copper, textAlign: 'center', marginTop: 20 },
   card: { margin: 16, backgroundColor: COLORS.card, borderRadius: 18, padding: 20, borderWidth: 1, borderColor: COLORS.border, shadowColor: COLORS.charcoal, shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
-  hero: { alignItems: 'center', paddingVertical: 18, borderBottomWidth: 1, borderBottomColor: COLORS.border, marginBottom: 8 },
+  hero: { alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border, marginBottom: 4 },
   heroLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 2 },
-  balance: { fontFamily: FONTS.display, fontSize: 44, color: COLORS.copper, marginTop: 6 },
+  balance: { fontFamily: FONTS.display, fontSize: 42, color: COLORS.copper, marginTop: 4 },
   balanceUnit: { fontFamily: FONTS.medium, fontSize: 18, color: COLORS.muted },
-  heroAddrRow: { width: '100%', marginTop: 12, backgroundColor: COLORS.parchment, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 },
+  heroAddrRow: { width: '100%', marginTop: 10, backgroundColor: COLORS.parchment, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 },
   heroAddr: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.charcoal, textAlign: 'center' },
-  label: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 1, marginTop: 18 },
+  label: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 1, marginTop: 14 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   chip: { backgroundColor: COLORS.parchment, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: COLORS.border },
   chipActive: { borderColor: COLORS.copper, backgroundColor: '#FBEFE2' },
   chipLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.charcoal },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 18 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 14 },
   gridBtn: { flex: 1, minWidth: '45%', minHeight: 54 },
   topActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10, paddingHorizontal: 16, marginTop: -8, marginBottom: 4 },
   iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.copper, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.copper, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
