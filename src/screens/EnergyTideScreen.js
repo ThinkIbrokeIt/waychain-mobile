@@ -1,18 +1,58 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Alert, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { COLORS, FONTS } from '../theme';
 import BrandHeader from '../components/BrandHeader';
 import Button from '../components/Button';
 
+const STORE_KEY = 'energyTideEntries';
+
 export default function EnergyTideScreen() {
   const [entry, setEntry] = useState('');
   const [entries, setEntries] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await SecureStore.getItemAsync(STORE_KEY);
+        if (raw) setEntries(JSON.parse(raw));
+      } catch (e) {
+        // corrupted store — start fresh
+      } finally {
+        setLoaded(true);
+      }
+    })();
+  }, []);
+
+  const persist = async (next) => {
+    try {
+      await SecureStore.setItemAsync(STORE_KEY, JSON.stringify(next));
+    } catch (e) {
+      Alert.alert('Error', 'Failed to save entry to vault.');
+    }
+  };
 
   const anchorTruth = async () => {
-    if (!entry) { Alert.alert('Error', 'Enter truth to anchor'); return; }
-    setEntries([...entries, { id: Date.now(), text: entry }]);
+    if (!entry.trim()) { Alert.alert('Error', 'Enter truth to anchor'); return; }
+    const next = [{ id: String(Date.now()), text: entry.trim(), ts: Date.now() }, ...entries];
+    setEntries(next);
     setEntry('');
-    Alert.alert('Truth Anchored', 'Journal entry secured to your vault.');
+    await persist(next);
+    Alert.alert('Truth Anchored', 'Secured to your vault. Eternal.');
+  };
+
+  const deleteEntry = (id) => {
+    Alert.alert('Delete entry?', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          const next = entries.filter(e => e.id !== id);
+          setEntries(next);
+          await persist(next);
+        }
+      },
+    ]);
   };
 
   return (
@@ -29,12 +69,21 @@ export default function EnergyTideScreen() {
       />
       <Button label="Anchor Truth" onPress={anchorTruth} style={styles.cta} />
       <View style={styles.list}>
-        {entries.map(e => (
+        {!loaded && <Text style={styles.empty}>Unsealing vault…</Text>}
+        {loaded && entries.length === 0 && <Text style={styles.empty}>No entries anchored yet.</Text>}
+        {loaded && entries.map(e => (
           <View key={e.id} style={styles.entryCard}>
             <Text style={styles.entryText}>{e.text}</Text>
+            <View style={styles.entryFoot}>
+              <Text style={styles.entryTime}>
+                {e.ts ? new Date(e.ts).toLocaleString() : ''}
+              </Text>
+              <TouchableOpacity onPress={() => deleteEntry(e.id)}>
+                <Text style={styles.delete}>Delete</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
-        {entries.length === 0 && <Text style={styles.empty}>No entries anchored yet.</Text>}
       </View>
     </ScrollView>
   );
@@ -49,5 +98,8 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 20, marginTop: 20 },
   entryCard: { backgroundColor: COLORS.card, borderLeftWidth: 4, borderLeftColor: COLORS.copper, borderRadius: 10, padding: 14, marginBottom: 10 },
   entryText: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.charcoal },
+  entryFoot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  entryTime: { fontFamily: FONTS.body, fontSize: 11, color: COLORS.muted },
+  delete: { fontFamily: FONTS.medium, fontSize: 13, color: '#B23A3A' },
   empty: { fontFamily: FONTS.body, fontSize: 14, color: COLORS.muted, textAlign: 'center', marginTop: 20 },
 });
