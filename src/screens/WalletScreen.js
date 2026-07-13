@@ -108,6 +108,17 @@ export default function WalletScreen({ navigation }) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.copper} />}>
       <BrandHeader subtitle="Self-Sovereign Wallet" />
 
+      {accounts.length > 0 && (
+        <View style={styles.topActions}>
+          <TouchableOpacity style={styles.iconBtn} onPress={createWallet} disabled={busy}>
+            <Text style={styles.iconBtnText}>＋</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('Settings')}>
+            <Text style={styles.iconBtnText}>⚙</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {revealMnemonic && (
         <View style={styles.reveal}>
           <Text style={styles.revealTitle}>⚠️ Write this down now</Text>
@@ -157,10 +168,6 @@ export default function WalletScreen({ navigation }) {
             <Button label="History" onPress={() => navigation.navigate('History')} variant="secondary" style={styles.gridBtn} />
             <Button label="Address Book" onPress={() => navigation.navigate('AddressBook')} variant="secondary" style={styles.gridBtn} />
           </View>
-          <View style={styles.row}>
-            <Button label="New Account" onPress={createWallet} variant="secondary" style={styles.half} disabled={busy} />
-            <Button label="Settings" onPress={() => navigation.navigate('Settings')} variant="secondary" style={styles.half} />
-          </View>
         </View>
       )}
     </ScrollView>
@@ -193,10 +200,11 @@ const styles = StyleSheet.create({
   chip: { backgroundColor: COLORS.parchment, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: COLORS.border },
   chipActive: { borderColor: COLORS.copper, backgroundColor: '#FBEFE2' },
   chipLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.charcoal },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 18 },
-  gridBtn: { flex: 1, minWidth: '45%' },
-  row: { flexDirection: 'row', gap: 12, marginTop: 12 },
-  half: { flex: 1 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 18 },
+  gridBtn: { flex: 1, minWidth: '45%', minHeight: 54 },
+  topActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10, paddingHorizontal: 16, marginTop: -8, marginBottom: 4 },
+  iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.copper, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.copper, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  iconBtnText: { fontFamily: FONTS.bold, fontSize: 22, color: COLORS.copper, textAlign: 'center' },
   reveal: { margin: 16, backgroundColor: '#FFF3E0', borderRadius: 14, padding: 18, borderWidth: 1, borderColor: COLORS.amber },
   revealTitle: { fontFamily: FONTS.display, fontSize: 18, color: '#9C5A24', textAlign: 'center' },
   revealText: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.charcoal, marginTop: 10, lineHeight: 24 },
