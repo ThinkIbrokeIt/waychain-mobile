@@ -13,6 +13,7 @@ export default function WalletScreen({ navigation }) {
   const [balance, setBalance] = useState('0');
   const [busy, setBusy] = useState(false);
   const [revealMnemonic, setRevealMnemonic] = useState(null);
+  const [revealAddr, setRevealAddr] = useState(null);
   const [needsBackup, setNeedsBackup] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -48,6 +49,7 @@ export default function WalletScreen({ navigation }) {
       setAccounts(accs);
       setActive(acc);
       setRevealMnemonic(acc.mnemonic);
+      setRevealAddr(acc.address);
       setNeedsBackup(true);
     } catch (e) {
       Alert.alert('Error', 'Wallet creation failed: ' + (e?.message || e));
@@ -55,12 +57,14 @@ export default function WalletScreen({ navigation }) {
   };
 
   const confirmSaved = async () => {
-    if (active) {
-      const next = await wallet.markBackedUp(active.address);
+    const addr = revealAddr || active?.address;
+    if (addr) {
+      const next = await wallet.markBackedUp(addr);
       setAccounts(next);
-      setActive(next.find(a => a.address === active.address));
+      setActive(next.find(a => a.address === addr));
     }
     setRevealMnemonic(null);
+    setRevealAddr(null);
     setNeedsBackup(!(await wallet.allBackedUp()));
   };
 
@@ -93,7 +97,7 @@ export default function WalletScreen({ navigation }) {
           <Text style={styles.gateText}>
             One account still needs its recovery phrase backed up. This is the only way to recover your funds if this device is lost.
           </Text>
-          <Button label="Show recovery phrase" onPress={() => setRevealMnemonic(pending.mnemonic)} style={styles.gateBtn} />
+          <Button label="Show recovery phrase" onPress={() => { setRevealAddr(pending.address); setRevealMnemonic(pending.mnemonic); }} style={styles.gateBtn} />
         </View>
       </View>
     );
@@ -125,7 +129,7 @@ export default function WalletScreen({ navigation }) {
       ) : (
         <View style={styles.card}>
           {active && !active.backedUp && (
-            <TouchableOpacity style={styles.warn} onPress={() => setRevealMnemonic(active.mnemonic)}>
+            <TouchableOpacity style={styles.warn} onPress={() => { setRevealAddr(active.address); setRevealMnemonic(active.mnemonic); }}>
               <Text style={styles.warnText}>⚠️ Not backed up — tap to view recovery phrase</Text>
             </TouchableOpacity>
           )}
