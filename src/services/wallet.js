@@ -2,34 +2,12 @@
 // EOA = Ed25519. Address = hex(publicKey) (64 hex chars), per WayChain chain source.
 // Mnemonic = BIP39. Seed (first 32 bytes) feeds Ed25519 (SHA512-based derivation).
 // NOTE: WayChain uses sha256 for hashing/selectors, NOT keccak256 (except cross-chain attestation storage).
+// RNG/crypto under Hermes is polyfilled in src/services/polyfills.js (imported first in index.js).
 import * as SecureStore from 'expo-secure-store';
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { getPublicKeyAsync, signAsync } from '@noble/ed25519';
 import { sha512 } from '@noble/hashes/sha512';
-
-// RN 0.79 / Hermes lacks WebCrypto asyncRNG for @noble/ed25519 v2 — provide a sync RNG hook.
-// We do NOT use this for key generation randomness (we use BIP39 mnemonic instead),
-// but @noble/ed25519 requires utils.randomBytes to be set if any code path needs it.
-import * as Crypto from 'expo-crypto';
-let rngReady = false;
-function ensureRng() {
-  if (rngReady) return;
-  const noble = require('@noble/ed25519');
-  noble.utils.randomBytes = (len) => {
-    // synchronous helper using expo-crypto's async bytes via a pre-filled buffer is not possible;
-    // noble v2 only calls randomBytes for non-deterministic ops we avoid. Provide a fallback.
-    const out = new Uint8Array(len);
-    // expo-crypto is async; for safety we use crypto.getRandomValues if present (Hermes RN 0.79 has it)
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-      crypto.getRandomValues(out);
-    } else {
-      throw new Error('No secure RNG available');
-    }
-    return out;
-  };
-  rngReady = true;
-}
 
 export const ACCOUNTS_KEY = 'waychain.accounts.v1';
 
@@ -75,7 +53,6 @@ export async function deriveFromPrivateKey(privateKeyHex) {
 
 // Sign arbitrary message bytes with the private key. Returns 64-byte sig (hex).
 export async function sign(privateKeyHex, messageBytes) {
-  ensureRng();
   const priv = Buffer.from(privateKeyHex.replace(/^0x/, ''), 'hex');
   const sig = await signAsync(messageBytes, priv);
   return '0x' + Buffer.from(sig).toString('hex');
