@@ -51,7 +51,9 @@ function Tabs() {
 export default function App() {
   // Auto-lock: record background time so AppLock can gate on return.
   useEffect(() => {
-    const sub = AppState.addEventListener('background', () => markBackground());
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'background') markBackground();
+    });
     return () => sub.remove();
   }, []);
 

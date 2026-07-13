@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, Clipboard } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import * as Clipboard from 'expo-clipboard';
 import { COLORS, FONTS } from '../theme';
 import BrandHeader from '../components/BrandHeader';
 import Button from '../components/Button';
@@ -11,7 +10,7 @@ export default function ReceiveScreen({ route }) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
-    await Clipboard.setStringAsync(address);
+    Clipboard.setString(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
