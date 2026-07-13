@@ -133,18 +133,23 @@ export default function WalletScreen({ navigation }) {
               <Text style={styles.warnText}>⚠️ Not backed up — tap to view recovery phrase</Text>
             </TouchableOpacity>
           )}
-          <Text style={styles.label}>Active Account</Text>
-          <Text style={styles.mono} selectable>{active?.address}</Text>
-          <Text style={styles.label}>Balance</Text>
-          <Text style={styles.balance}>{balance} WAY</Text>
+
+          <View style={styles.hero}>
+            <Text style={styles.heroLabel}>Total Balance</Text>
+            <Text style={styles.balance}>{balance}<Text style={styles.balanceUnit}> WAY</Text></Text>
+            <View style={styles.heroAddrRow}>
+              <Text style={styles.heroAddr} selectable numberOfLines={1}>{active?.address}</Text>
+            </View>
+          </View>
 
           <Text style={styles.label}>Accounts ({accounts.length})</Text>
-          {accounts.map((a, i) => (
-            <TouchableOpacity key={a.address} style={[styles.acct, a.address === active?.address && styles.acctActive]} onPress={() => setActive(a)}>
-              <Text style={styles.acctLabel}>{a.label || ('Account ' + (i + 1))}{a.backedUp ? '  ✓' : '  ⚠'}</Text>
-              <Text style={styles.acctAddr}>{a.address.slice(0, 14)}…{a.address.slice(-8)}</Text>
-            </TouchableOpacity>
-          ))}
+          <View style={styles.chips}>
+            {accounts.map((a, i) => (
+              <TouchableOpacity key={a.address} style={[styles.chip, a.address === active?.address && styles.chipActive]} onPress={() => setActive(a)}>
+                <Text style={styles.chipLabel}>{a.label || ('Account ' + (i + 1))}{a.backedUp ? '  ✓' : '  ⚠'}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           <View style={styles.grid}>
             <Button label="Receive" onPress={() => navigation.navigate('Receive', { address: active?.address })} variant="secondary" style={styles.gridBtn} />
@@ -176,19 +181,23 @@ const styles = StyleSheet.create({
   sub: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.muted, textAlign: 'center', marginBottom: 28 },
   cta: { marginTop: 8 },
   link: { fontFamily: FONTS.medium, fontSize: 15, color: COLORS.copper, textAlign: 'center', marginTop: 20 },
-  card: { margin: 20, backgroundColor: COLORS.card, borderRadius: 16, padding: 24, borderWidth: 1, borderColor: COLORS.border },
-  label: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 1, marginTop: 14 },
-  mono: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.charcoal },
-  balance: { fontFamily: FONTS.display, fontSize: 34, color: COLORS.copper, marginTop: 2 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 16 },
+  card: { margin: 16, backgroundColor: COLORS.card, borderRadius: 18, padding: 20, borderWidth: 1, borderColor: COLORS.border, shadowColor: COLORS.charcoal, shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
+  hero: { alignItems: 'center', paddingVertical: 18, borderBottomWidth: 1, borderBottomColor: COLORS.border, marginBottom: 8 },
+  heroLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 2 },
+  balance: { fontFamily: FONTS.display, fontSize: 44, color: COLORS.copper, marginTop: 6 },
+  balanceUnit: { fontFamily: FONTS.medium, fontSize: 18, color: COLORS.muted },
+  heroAddrRow: { width: '100%', marginTop: 12, backgroundColor: COLORS.parchment, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 },
+  heroAddr: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.charcoal, textAlign: 'center' },
+  label: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 1, marginTop: 18 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  chip: { backgroundColor: COLORS.parchment, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: COLORS.border },
+  chipActive: { borderColor: COLORS.copper, backgroundColor: '#FBEFE2' },
+  chipLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.charcoal },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 18 },
   gridBtn: { flex: 1, minWidth: '45%' },
   row: { flexDirection: 'row', gap: 12, marginTop: 12 },
   half: { flex: 1 },
-  acct: { backgroundColor: COLORS.parchment, borderRadius: 10, padding: 12, marginTop: 8, borderWidth: 1, borderColor: COLORS.border },
-  acctActive: { borderColor: COLORS.copper, borderWidth: 2 },
-  acctLabel: { fontFamily: FONTS.medium, fontSize: 15, color: COLORS.charcoal },
-  acctAddr: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.muted },
-  reveal: { margin: 20, marginTop: 0, backgroundColor: '#FFF3E0', borderRadius: 12, padding: 18, borderWidth: 1, borderColor: COLORS.amber },
+  reveal: { margin: 16, backgroundColor: '#FFF3E0', borderRadius: 14, padding: 18, borderWidth: 1, borderColor: COLORS.amber },
   revealTitle: { fontFamily: FONTS.display, fontSize: 18, color: '#9C5A24', textAlign: 'center' },
   revealText: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.charcoal, marginTop: 10, lineHeight: 24 },
   revealNote: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.muted, marginTop: 10 },
