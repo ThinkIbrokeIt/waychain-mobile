@@ -9,6 +9,19 @@ import { wordlist } from '@scure/bip39/wordlists/english';
 import { getPublicKeyAsync, signAsync } from '@noble/ed25519';
 import { sha512 } from '@noble/hashes/sha512';
 
+// RN/Hermes has no global Buffer — use Uint8Array <-> hex helpers.
+function bytesToHex(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i++) s += bytes[i].toString(16).padStart(2, '0');
+  return s;
+}
+function hexToBytes(hex) {
+  const h = hex.replace(/^0x/, '');
+  const out = new Uint8Array(h.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(h.substr(i * 2, 2), 16);
+  return out;
+}
+
 export const ACCOUNTS_KEY = 'waychain.accounts.v1';
 
 export function newMnemonic(words = 12) {
@@ -28,9 +41,9 @@ export async function deriveFromMnemonic(mnemonic) {
   const pub = await getPublicKeyAsync(priv);
   return {
     mnemonic: mnemonic.trim(),
-    privateKey: '0x' + Buffer.from(priv).toString('hex'),
-    publicKey: '0x' + Buffer.from(pub).toString('hex'),
-    address: '0x' + Buffer.from(pub).toString('hex'),
+    privateKey: '0x' + bytesToHex(priv),
+    publicKey: '0x' + bytesToHex(pub),
+    address: '0x' + bytesToHex(pub),
   };
 }
 
@@ -42,20 +55,20 @@ export async function deriveFromPrivateKey(privateKeyHex) {
     hex = hex.slice(0, 64);
   }
   if (hex.length !== 64) throw new Error('Private key must be 32 bytes (64 hex chars)');
-  const priv = Buffer.from(hex, 'hex');
+  const priv = hexToBytes(hex);
   const pub = await getPublicKeyAsync(priv);
   return {
-    privateKey: '0x' + Buffer.from(priv).toString('hex'),
-    publicKey: '0x' + Buffer.from(pub).toString('hex'),
-    address: '0x' + Buffer.from(pub).toString('hex'),
+    privateKey: '0x' + bytesToHex(priv),
+    publicKey: '0x' + bytesToHex(pub),
+    address: '0x' + bytesToHex(pub),
   };
 }
 
 // Sign arbitrary message bytes with the private key. Returns 64-byte sig (hex).
 export async function sign(privateKeyHex, messageBytes) {
-  const priv = Buffer.from(privateKeyHex.replace(/^0x/, ''), 'hex');
+  const priv = hexToBytes(privateKeyHex.replace(/^0x/, ''));
   const sig = await signAsync(messageBytes, priv);
-  return '0x' + Buffer.from(sig).toString('hex');
+  return '0x' + bytesToHex(sig);
 }
 
 // ---- SecureStore-backed multi-account persistence ----
