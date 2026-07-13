@@ -5,3 +5,7 @@ dist/
 web-build/
 android/
 ios/
+
+# screenshots
+*.png
+!assets/*.png
