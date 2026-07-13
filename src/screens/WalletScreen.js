@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   chipActive: { borderColor: COLORS.copper, backgroundColor: 'rgba(184,115,51,0.18)' },
   chipLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.charcoal },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 14 },
-  gridBtn: { flex: 1, minWidth: '45%', minHeight: 54 },
+  gridBtn: { flex: 1, minWidth: '45%', minHeight: 42 },
   topActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10, paddingHorizontal: 16, marginTop: -8, marginBottom: 4 },
   iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.copper, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.copper, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   iconBtnText: { fontFamily: FONTS.bold, fontSize: 22, color: COLORS.copper, textAlign: 'center' },

@@ -21,7 +21,7 @@ export default function Button({ label, onPress, variant = 'primary', disabled =
 const styles = StyleSheet.create({
   base: {
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 9,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
