@@ -147,7 +147,9 @@ export const PRECOMPILES = {
     methods: [
       { name: 'deposit', sel: '4e26609a', sig: 'deposit(uint256)', kind: 'write' },
       { name: 'withdraw', sel: '2e1a7ddd', sig: 'withdraw(uint256)', kind: 'write' },
-      { name: 'claimRewards', sel: '6b6f4360', sig: 'claimRewards()', kind: 'read' },
+      { name: 'claimRewards', sel: '6b6f4360', sig: 'claimRewards()', kind: 'write' },
+      { name: 'getUserDeposit', sel: '3c5f5f80', sig: 'getUserDeposit(address)', kind: 'read', args: ['account'] },
+      { name: 'getPoolStats', sel: '8c5f41d0', sig: 'getPoolStats()', kind: 'read' },
     ],
   },
   '0x1A': {
@@ -199,8 +201,8 @@ export const PRECOMPILES = {
     methods: [
       { name: 'createProposal', sel: 'd1e2f3a4', sig: 'createProposal()', kind: 'write' },
       { name: 'vote', sel: 'e2f3a4b5', sig: 'vote()', kind: 'write' },
-      { name: 'getProposal', sel: 'f3a4b5c6', sig: 'getProposal()', kind: 'read' },
-      { name: 'getVote', sel: 'a4b5c6d7', sig: 'getVote()', kind: 'read' },
+      { name: 'getProposal', sel: 'f3a4b5c6', sig: 'getProposal(bytes32)', kind: 'read', args: ['proposalID'] },
+      { name: 'getVote', sel: 'a4b5c6d7', sig: 'getVote(bytes32)', kind: 'read', args: ['proposalID'] },
       { name: 'getCredits', sel: 'b5c6d7e8', sig: 'getCredits()', kind: 'read' },
       { name: 'finalize', sel: 'c6d7e8f9', sig: 'finalize()', kind: 'write' },
       { name: 'createMarket', sel: 'd7e8f9a0', sig: 'createMarket()', kind: 'write' },
@@ -243,9 +245,12 @@ export const PRECOMPILES = {
   '0x21': {
     name: 'WIFRGantletRewards',
     file: 'evm/precompiles.go',
-    noSelector: true,
-    methods: [{ name: 'claimReward', sig: 'claimReward() — raw input layout', kind: 'write' }],
-  },
+    methods: [
+      { name: 'initialize', sel: 'cf705883', sig: 'initialize()', kind: 'write' },
+      { name: 'getRemainingRewards', sel: '63760e3d', sig: 'getRemainingRewards(uint64)', kind: 'read', args: ['poolId'] },
+      { name: 'getTotalRemaining', sel: '100678aa', sig: 'getTotalRemaining()', kind: 'read' },
+      { name: 'claimPioneer', sel: '8aa238fa', sig: 'claimPioneer(address)', kind: 'write', args: ['pioneer'] },
+    ],  },
   '0x22': {
     name: 'WayStablecoin',
     file: 'evm/way_stablecoin.go',
