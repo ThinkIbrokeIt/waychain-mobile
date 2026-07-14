@@ -47,10 +47,10 @@ export default function SendScreen({ route, navigation }) {
     if (!preview) return;
     setBusy(true);
     try {
-      const nonce = await getNonce(account.address);
+      const nonce = await getNonce(account.publicKey);
       const res = await buildAndSignTx({
         fromPrivHex: account.privateKey,
-        fromAddr: account.address,
+        fromPub64: account.publicKey,
         to: preview.to,
         valueWei: BigInt(preview.valueWei),
         nonce,

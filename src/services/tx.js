@@ -53,12 +53,14 @@ function bytesToHex(bytes) {
 }
 
 // Build + sign a transaction. privHex = 0x + 64 hex (32-byte Ed25519 seed).
-// Build + sign a transaction. privHex = 0x + 64 hex (32-byte Ed25519 seed).
-// NOTE: WayChain addresses on the wire are RAW hex (no 0x prefix) — the Go chain's
-// ParsePubKey(From) expects hex(pubkey) without 0x. Strip prefixes here.
-export async function buildAndSignTx({ fromPrivHex, fromAddr, to, valueWei, nonce, gasLimit = 21000, gasPrice = 1, data = new Uint8Array(0), encryptedData = new Uint8Array(0) }) {
+// fromPub64 = 0x + 64 hex (FULL ed25519 pubkey) — this is the on-wire `from`
+// AND the node's account key. ParsePubKey(tx.From) requires 64-hex; the 20-byte
+// display address is NOT valid here (verified live 2026-07-14: 20-byte balance=0,
+// eth_sendRawTransaction with 20-byte from is rejected). Do NOT pass the 20-byte
+// address as fromPub64.
+export async function buildAndSignTx({ fromPrivHex, fromPub64, to, valueWei, nonce, gasLimit = 21000, gasPrice = 1, data = new Uint8Array(0), encryptedData = new Uint8Array(0) }) {
   const priv = hexToBytes(fromPrivHex.replace(/^0x/, ''));
-  const fromRaw = fromAddr.replace(/^0x/, '');
+  const fromRaw = fromPub64.replace(/^0x/, '');   // 64-hex, no prefix — wire `from`
   const toRaw = (to || '').replace(/^0x/, '');
   const tx = {
     nonce: Number(nonce),
