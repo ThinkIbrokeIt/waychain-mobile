@@ -35,19 +35,24 @@ export function isValidMnemonic(m) {
 
 // Derive Ed25519 keypair from a BIP39 mnemonic.
 // Ed25519 seed = first 32 bytes of the BIP39 seed (standard ed25519 HD practice).
+// Canonical address = hex(pubkey)[0:40] (20-byte form), per evm/crypto_verify.go
+// addrFromPubKey. NOTE: this previously returned the full 64-hex pubkey, which
+// does NOT match the chain's StateDB address — fixed to [0:40].
 export async function deriveFromMnemonic(mnemonic) {
   const seed = mnemonicToSeedSync(mnemonic.trim());
   const priv = seed.slice(0, 32); // 32-byte Ed25519 seed
   const pub = await getPublicKeyAsync(priv);
+  const pubHex = bytesToHex(pub);
   return {
     mnemonic: mnemonic.trim(),
     privateKey: '0x' + bytesToHex(priv),
-    publicKey: '0x' + bytesToHex(pub),
-    address: '0x' + bytesToHex(pub),
+    publicKey: '0x' + pubHex,
+    address: '0x' + pubHex.slice(0, 40),
   };
 }
 
 // Derive directly from a raw private key (hex, 32 bytes / 64 hex chars, optional 0x).
+// Address = hex(pubkey)[0:40] (20-byte canonical form, per chain addrFromPubKey).
 export async function deriveFromPrivateKey(privateKeyHex) {
   let hex = privateKeyHex.replace(/^0x/, '').trim();
   if (hex.length === 128) {
@@ -57,10 +62,11 @@ export async function deriveFromPrivateKey(privateKeyHex) {
   if (hex.length !== 64) throw new Error('Private key must be 32 bytes (64 hex chars)');
   const priv = hexToBytes(hex);
   const pub = await getPublicKeyAsync(priv);
+  const pubHex = bytesToHex(pub);
   return {
     privateKey: '0x' + bytesToHex(priv),
-    publicKey: '0x' + bytesToHex(pub),
-    address: '0x' + bytesToHex(pub),
+    publicKey: '0x' + pubHex,
+    address: '0x' + pubHex.slice(0, 40),
   };
 }
 
