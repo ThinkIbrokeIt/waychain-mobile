@@ -17,13 +17,18 @@ export const hexToNum = (hex) => {
   }
 };
 
-// Precompile addresses (from WayChain chain source, AGENTS.md). 0x0C–0x20.
+// Precompile addresses — imported from the shared registry (issue #9).
+// Single source of truth: src/services/precompiles.js mirrors
+// waychain-consensus/evm/precompiles.go (0x0C–0x26).
+import { PRECOMPILES as REGISTRY, precompileAddress, encodeCall } from './precompiles';
+
+// Backwards-compatible named map for existing call sites.
 const PRECOMPILES = {
-  BIJO:  '0x0000000000000000000000000000000000000014', // BinaryJournal token
-  TWO_WAY: '0x0000000000000000000000000000000000000018', // TwoWayVault
-  TRUSTLESS_LOCK: '0x000000000000000000000000000000000000001A', // TrustlessLock
-  GOVERNANCE: '0x000000000000000000000000000000000000001D',
-  WIFR:  '0x0000000000000000000000000000000000000021', // (per session memory) WIFR reward token
+  BIJO:           precompileAddress('0x14'),
+  TWO_WAY:        precompileAddress('0x18'),
+  TRUSTLESS_LOCK: precompileAddress('0x1A'),
+  GOVERNANCE:     precompileAddress('0x1D'),
+  WIFR:           precompileAddress('0x21'),
 };
 
 // ABI selectors: WayChain uses sha256(signature)[:4], NOT keccak256.
