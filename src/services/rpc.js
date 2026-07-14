@@ -4,6 +4,19 @@ import { deriveFromMnemonic, deriveFromPrivateKey, newMnemonic, sign } from './w
 
 const RPC_URL = 'https://api.waychain.org';
 
+// Decode a 0x-hex bigint string ("0x1a2b") → JS number (safe for UI display
+// of counts/totals that fit in a double. Returns 0 on empty/invalid.
+export const hexToNum = (hex) => {
+  if (!hex || hex === '0x' || hex === '0x0') return 0;
+  try {
+    const clean = hex.startsWith('0x') ? hex.slice(2) : hex;
+    // Use BigInt then Number for display; values here are small counts/wei-totals.
+    return Number(BigInt('0x' + clean));
+  } catch {
+    return 0;
+  }
+};
+
 // Precompile addresses (from WayChain chain source, AGENTS.md). 0x0C–0x20.
 const PRECOMPILES = {
   BIJO:  '0x0000000000000000000000000000000000000014', // BinaryJournal token
@@ -23,11 +36,35 @@ export const waychainRPC = {
     const res = await fetch(RPC_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 })
+      body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 }),
     });
     const json = await res.json();
     if (json.error) throw new Error(json.error.message || 'RPC error');
-    return json.result || null;
+    return json.result ?? null;
+  },
+
+  // Wallet P3 panel reads. These call the read-only way_* methods added to
+  // waychain-consensus (rpc.go). They throw if the live RPC lacks the method,
+  // so callers can fall back to the honest FeaturePending panel.
+  getGovernanceProposals: async () => {
+    const r = await waychainRPC.call('way_govProposals', []);
+    return Array.isArray(r) ? r : [];
+  },
+  getTwoWayStats: async () => {
+    const r = await waychainRPC.call('way_twoWayStats', []);
+    if (!r || typeof r !== 'object') throw new Error('no twoWayStats');
+    return {
+      vaults: hexToNum(r.vaults),
+      totalDebt: hexToNum(r.totalDebt),
+    };
+  },
+  getBridgeStats: async () => {
+    const r = await waychainRPC.call('way_bridgeStats', []);
+    if (!r || typeof r !== 'object') throw new Error('no bridgeStats');
+    return {
+      committed: hexToNum(r.committed),
+      withdrawn: hexToNum(r.withdrawn),
+    };
   },
 
   // WayChain native balance method (per AGENTS.md RPC endpoints)
