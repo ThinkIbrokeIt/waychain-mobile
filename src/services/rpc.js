@@ -82,7 +82,7 @@ export const waychainRPC = {
       // fallback to eth_call on BIJO precompile (sha256 selector)
       const addrHex = address.replace(/^0x/, '').toLowerCase().padStart(64, '0');
       const data = SELECTORS.balanceOf + addrHex;
-      return waychainRPC.call('eth_call', [{ to: PRECOMPILES.BIJO, data }, 'latest']);
+      return waychainRPC.call('eth_call', [{ to: PRECOMPILES.BIJO, data }]);
     }
   },
 
@@ -117,7 +117,7 @@ export const waychainRPC = {
     const data = encodeCall(addr1, method, argsHex);
 
     if (m.kind === 'read' && !opts.write) {
-      return waychainRPC.call('eth_call', [{ to, data }, 'latest']);
+      return waychainRPC.call('eth_call', [{ to, data }]);
     }
     // WRITE path
     if (!opts.privHex || !opts.addr) throw new Error('write requires { privHex, addr }');
