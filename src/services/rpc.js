@@ -21,6 +21,7 @@ export const hexToNum = (hex) => {
 // Single source of truth: src/services/precompiles.js mirrors
 // waychain-consensus/evm/precompiles.go (0x0C–0x26).
 import { PRECOMPILES as REGISTRY, precompileAddress, encodeCall } from './precompiles';
+import { buildAndSignTx, getNonce, sendRawTransaction } from './tx';
 
 // Backwards-compatible named map for existing call sites.
 const PRECOMPILES = {
@@ -97,6 +98,48 @@ export const waychainRPC = {
   },
 
   sign,
+
+  // ── Per-precompile call layer (issue #11, child of #8) ──
+  // Unified read/write entrypoint for all 27 precompiles, built on the
+  // shared registry (#9) + real auth (#10) + tx pipeline (tx.js).
+  //
+  //   precompileCall('0x22', 'createVault', '0x'+vaultId, { write:true, privHex, addr })
+  //   precompileCall('0x14', 'balanceOf', addrHex)   // read
+  //
+  // READ:  eth_call to the precompile address with encodeCall(...) data.
+  // WRITE: get nonce -> build+sign tx -> eth_sendRawTransaction.
+  precompileCall: async (addr1, method, argsHex = '', opts = {}) => {
+    const pc = REGISTRY[addr1];
+    if (!pc) throw new Error(`Unknown precompile ${addr1}`);
+    const m = pc.methods.find((x) => x.name === method);
+    if (!m) throw new Error(`Unknown method ${method} on ${pc.name}`);
+    const to = precompileAddress(addr1);
+    const data = encodeCall(addr1, method, argsHex);
+
+    if (m.kind === 'read' && !opts.write) {
+      return waychainRPC.call('eth_call', [{ to, data }, 'latest']);
+    }
+    // WRITE path
+    if (!opts.privHex || !opts.addr) throw new Error('write requires { privHex, addr }');
+    const nonce = await getNonce(opts.addr);
+    const { rawHex } = await buildAndSignTx({
+      fromPrivHex: opts.privHex,
+      fromAddr: opts.addr,
+      to,
+      valueWei: 0,
+      nonce,
+      data: hexToBytesLocal(data),
+    });
+    return sendRawTransaction(rawHex);
+  },
 };
+
+// Local hex->bytes (rpc.js has no Buffer; precompileCall needs it for tx data).
+function hexToBytesLocal(hex) {
+  const h = hex.replace(/^0x/, '');
+  const out = new Uint8Array(h.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(h.substr(i * 2, 2), 16);
+  return out;
+}
 
 export default waychainRPC;

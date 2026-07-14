@@ -8,7 +8,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "test": "node test/precompiles.test.mjs"
+    "test": "node test/precompiles.test.mjs && node test/precompile-call.test.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",
