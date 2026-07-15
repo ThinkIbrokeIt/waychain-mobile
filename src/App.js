@@ -18,6 +18,7 @@ import WIFRScreen from './screens/WIFRScreen';
 import TokensScreen from './screens/TokensScreen';
 import IdentityScreen from './screens/IdentityScreen';
 import LocksScreen from './screens/LocksScreen';
+import ProtocolScreen from './screens/ProtocolScreen';
 import AppLock from './components/AppLock';
 import { COLORS } from './theme';
 import { markBackground } from './services/secure';
@@ -77,6 +78,7 @@ export default function App() {
           <Stack.Screen name="Tokens" component={TokensScreen} />
           <Stack.Screen name="Identity" component={IdentityScreen} />
           <Stack.Screen name="Locks" component={LocksScreen} />
+          <Stack.Screen name="Protocol" component={ProtocolScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
