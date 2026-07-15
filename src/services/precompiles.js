@@ -321,7 +321,7 @@ export const PRECOMPILE_LIST = Object.entries(PRECOMPILES).map(([addr, v]) => ({
 
 // Encode a precompile call.
 //  - Selector precompiles (most): data = selector(4 bytes) + argsHex.
-//  - No-selector precompiles (0x0C-0x12, 0x17, 0x21): data = argsHex directly
+//  - No-selector precompiles (0x0C-0x12, 0x17): data = argsHex directly (no 4-byte selector).
 //    (the Go function reads a fixed raw input layout, no selectorBytes dispatch).
 // Returns the `data` payload for eth_call / sendRawTransaction.
 export const encodeCall = (addr1, methodName, argsHex = '') => {
