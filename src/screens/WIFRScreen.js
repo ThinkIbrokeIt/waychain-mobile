@@ -5,6 +5,7 @@ import BrandHeader from '../components/BrandHeader';
 import Button from '../components/Button';
 import { wallet } from '../services/wallet';
 import { waychainRPC } from '../services/rpc';
+import { useNavigation } from '@react-navigation/native';
 
 // WIFR Gauntlet Rewards (precompile 0x21).
 // Reads: getTotalRemaining(), getRemainingRewards(uint64 poolId).
@@ -32,6 +33,7 @@ function formatWay(hex) {
 }
 
 export default function WIFRScreen() {
+  const navigation = useNavigation();
   const [account, setAccount] = useState(null);
   const [total, setTotal] = useState(null);
   const [pools, setPools] = useState({});
@@ -136,6 +138,8 @@ export default function WIFRScreen() {
           <Text style={styles.refreshText}>Tap to refresh balances</Text>
         </TouchableOpacity>
       )}
+
+      <Button label="Open Quests" onPress={() => navigation.navigate('Quests')} style={styles.questsBtn} />
     </ScrollView>
   );
 }
@@ -157,4 +161,5 @@ const styles = StyleSheet.create({
   claimBtn: { marginTop: 18 },
   refresh: { marginTop: 14, alignItems: 'center' },
   refreshText: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.copper },
+  questsBtn: { marginTop: 18 },
 });

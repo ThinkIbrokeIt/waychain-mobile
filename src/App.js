@@ -15,6 +15,8 @@ import HistoryScreen from './screens/HistoryScreen';
 import AddressBookScreen from './screens/AddressBookScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import WIFRScreen from './screens/WIFRScreen';
+import QuestsScreen from './screens/QuestsScreen';
+import StablecoinScreen from './screens/StablecoinScreen';
 import TokensScreen from './screens/TokensScreen';
 import IdentityScreen from './screens/IdentityScreen';
 import LocksScreen from './screens/LocksScreen';
@@ -75,6 +77,9 @@ export default function App() {
           <Stack.Screen name="Send" component={SendScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
           <Stack.Screen name="AddressBook" component={AddressBookScreen} />
+          <Stack.Screen name="WIFR" component={WIFRScreen} />
+          <Stack.Screen name="Quests" component={QuestsScreen} />
+          <Stack.Screen name="Stablecoin" component={StablecoinScreen} />
           <Stack.Screen name="Tokens" component={TokensScreen} />
           <Stack.Screen name="Identity" component={IdentityScreen} />
           <Stack.Screen name="Locks" component={LocksScreen} />

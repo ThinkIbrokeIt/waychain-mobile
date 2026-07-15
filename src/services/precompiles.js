@@ -271,6 +271,7 @@ export const PRECOMPILES = {
     methods: [
       { name: 'taskClaim', sel: 'a1b2c3d4', sig: 'taskClaim(bytes32)', kind: 'write' },
       { name: 'taskVerify', sel: 'b2c3d4e5', sig: 'taskVerify(bytes32,address)', kind: 'write' },
+      { name: 'taskStatus', sel: 'c3d4e5f6', sig: 'taskStatus(bytes32)', kind: 'read' },
     ],
   },
   '0x24': {
