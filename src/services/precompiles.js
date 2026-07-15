@@ -199,8 +199,8 @@ export const PRECOMPILES = {
     name: 'Governance',
     file: 'evm/governance.go',
     methods: [
-      { name: 'createProposal', sel: 'd1e2f3a4', sig: 'createProposal()', kind: 'write' },
-      { name: 'vote', sel: 'e2f3a4b5', sig: 'vote()', kind: 'write' },
+      { name: 'createProposal', sel: 'd1e2f3a4', sig: 'createProposal(uint8 voteType,bytes32 titleHash,bytes32 descHash,address target,bytes calldata)', kind: 'write' },
+      { name: 'vote', sel: 'e2f3a4b5', sig: 'vote(bytes32 proposalID,uint8 voteDirection,uint256 credits)', kind: 'write' },
       { name: 'getProposal', sel: 'f3a4b5c6', sig: 'getProposal(bytes32)', kind: 'read', args: ['proposalID'] },
       { name: 'getVote', sel: 'a4b5c6d7', sig: 'getVote(bytes32)', kind: 'read', args: ['proposalID'] },
       { name: 'getCredits', sel: 'b5c6d7e8', sig: 'getCredits()', kind: 'read' },
