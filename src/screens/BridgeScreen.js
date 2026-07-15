@@ -47,7 +47,7 @@ export default function BridgeScreen() {
       {!loading && pending && (
         <FeaturePending
           title="Cross-chain bridging is being wired"
-          detail="The CrossChainAttestation precompile (0x1F) verifies Bitcoin ↔ WayChain proofs using SHA-256 (not keccak). BTC pegging via the BitcoinRegistry (0x16) will surface here once the public RPC exposes a read method."
+          detail="The CrossChainAttestation precompile (0x1F) verifies Bitcoin ↔ WayChain proofs using SHA-256 (not keccak). Bridge statistics are live via way_bridgeStats — this screen will surface them in a follow-up."
           precompile="0x1F · CrossChainAttestation"
         />
       )}
