@@ -14,6 +14,10 @@ import SendScreen from './screens/SendScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import AddressBookScreen from './screens/AddressBookScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import WIFRScreen from './screens/WIFRScreen';
+import TokensScreen from './screens/TokensScreen';
+import IdentityScreen from './screens/IdentityScreen';
+import LocksScreen from './screens/LocksScreen';
 import AppLock from './components/AppLock';
 import { COLORS } from './theme';
 import { markBackground } from './services/secure';
@@ -47,6 +51,7 @@ function Tabs() {
       <Tab.Screen name="Stake" component={StakingScreen} />
       <Tab.Screen name="Bridge" component={BridgeScreen} />
       <Tab.Screen name="Governance" component={GovernanceScreen} />
+      <Tab.Screen name="WIFR" component={WIFRScreen} />
     </Tab.Navigator>
   );
 }
@@ -69,6 +74,9 @@ export default function App() {
           <Stack.Screen name="Send" component={SendScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
           <Stack.Screen name="AddressBook" component={AddressBookScreen} />
+          <Stack.Screen name="Tokens" component={TokensScreen} />
+          <Stack.Screen name="Identity" component={IdentityScreen} />
+          <Stack.Screen name="Locks" component={LocksScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>

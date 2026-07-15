@@ -168,6 +168,9 @@ export default function WalletScreen({ navigation }) {
             <Button label="Send" onPress={goSend} variant="secondary" style={styles.gridBtn} />
             <Button label="History" onPress={() => navigation.navigate('History')} variant="secondary" style={styles.gridBtn} />
             <Button label="Address Book" onPress={() => navigation.navigate('AddressBook')} variant="secondary" style={styles.gridBtn} />
+            <Button label="Tokens" onPress={() => navigation.navigate('Tokens')} variant="secondary" style={styles.gridBtn} />
+            <Button label="Identity" onPress={() => navigation.navigate('Identity')} variant="secondary" style={styles.gridBtn} />
+            <Button label="Locks" onPress={() => navigation.navigate('Locks')} variant="secondary" style={styles.gridBtn} />
           </View>
         </View>
       )}
