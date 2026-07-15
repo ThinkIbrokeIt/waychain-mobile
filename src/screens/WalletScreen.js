@@ -34,11 +34,11 @@ export default function WalletScreen({ navigation }) {
     catch { setBalance('0'); }
   }, []);
 
-  useEffect(() => { if (active) refreshBalance(active.address); }, [active, refreshBalance]);
+  useEffect(() => { if (active) refreshBalance(active.publicKey); }, [active, refreshBalance]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    if (active) await refreshBalance(active.address);
+    if (active) await refreshBalance(active.publicKey);
     setRefreshing(false);
   }, [active, refreshBalance]);
 
