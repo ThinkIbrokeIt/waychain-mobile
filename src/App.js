@@ -9,6 +9,7 @@ import DEXScreen from './screens/DEXScreen';
 import StakingScreen from './screens/StakingScreen';
 import BridgeScreen from './screens/BridgeScreen';
 import GovernanceScreen from './screens/GovernanceScreen';
+import WIFRScreen from './screens/WIFRScreen';
 import ReceiveScreen from './screens/ReceiveScreen';
 import SendScreen from './screens/SendScreen';
 import HistoryScreen from './screens/HistoryScreen';
@@ -37,6 +38,7 @@ function Tabs() {
             Stake: 'bank',
             Bridge: 'bridge',
             Governance: 'vote',
+            WIFR: 'trophy',
           };
           return <MaterialCommunityIcons name={icons[route.name] || 'circle'} color={color} size={size} />;
         },
@@ -47,6 +49,7 @@ function Tabs() {
       <Tab.Screen name="Stake" component={StakingScreen} />
       <Tab.Screen name="Bridge" component={BridgeScreen} />
       <Tab.Screen name="Governance" component={GovernanceScreen} />
+      <Tab.Screen name="WIFR" component={WIFRScreen} />
     </Tab.Navigator>
   );
 }

@@ -22,7 +22,7 @@ export default function GovernanceScreen() {
       .finally(() => setLoading(false));
   }, []);
 
-  const active = proposasls.filter(p => p.status === 1).length;
+  const active = proposals.filter(p => p.status === 1).length;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
@@ -30,7 +30,7 @@ export default function GovernanceScreen() {
       <View style={styles.statRow}>
         <View style={styles.stat}><Text style={styles.statLabel}>Block</Text><Text style={styles.statVal}>#{block ?? '—'}</Text></View>
         <View style={styles.stat}><Text style={styles.statLabel}>Vote Type</Text><Text style={styles.statVal}>Direct</Text></View>
-        <View style={styles.stat}><Text style={styles.statLabel}>Proposals</Text><Text style={styles.statVal}>{loading ? '—' : (pending ? '0' : proposasls.length)}</Text></View>
+        <View style={styles.stat}><Text style={styles.statLabel}>Proposals</Text><Text style={styles.statVal}>{loading ? '—' : (pending ? '0' : proposals.length)}</Text></View>
       </View>
 
       {loading && <ActivityIndicator color={COLORS.copper} style={{ marginTop: 24 }} />}
@@ -41,7 +41,7 @@ export default function GovernanceScreen() {
           {proposals.length === 0 ? (
             <Text style={styles.liveNote}>No proposals yet. The Governance precompile (0x1D) is live — create one from a Level-2+ account.</Text>
           ) : (
-            proposasls.map((p, i) => (
+            proposals.map((p, i) => (
               <View key={p.id || i} style={styles.propRow}>
                 <View style={styles.propMeta}>
                   <Text style={styles.propType}>{VOTE_TYPE[p.voteType] ?? 'Direct'}</Text>
