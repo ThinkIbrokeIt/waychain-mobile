@@ -103,7 +103,7 @@ export const waychainRPC = {
   // Unified read/write entrypoint for all 27 precompiles, built on the
   // shared registry (#9) + real auth (#10) + tx pipeline (tx.js).
   //
-  //   precompileCall('0x22', 'createVault', '0x'+vaultId, { write:true, privHex, addr })
+  //   precompileCall('0x22', 'createVault', '0x'+vaultId, { write:true, privHex, pub64 })
   //   precompileCall('0x14', 'balanceOf', addrHex)   // read
   //
   // READ:  eth_call to the precompile address with encodeCall(...) data.
@@ -120,11 +120,11 @@ export const waychainRPC = {
       return waychainRPC.call('eth_call', [{ to, data }]);
     }
     // WRITE path
-    if (!opts.privHex || !opts.addr) throw new Error('write requires { privHex, addr }');
-    const nonce = await getNonce(opts.addr);
+    if (!opts.privHex || !opts.pub64) throw new Error('write requires { privHex, pub64 }');
+    const nonce = await getNonce(opts.pub64);
     const { rawHex } = await buildAndSignTx({
       fromPrivHex: opts.privHex,
-      fromAddr: opts.addr,
+      fromPub64: opts.pub64,
       to,
       valueWei: 0,
       nonce,
