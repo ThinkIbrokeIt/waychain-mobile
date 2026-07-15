@@ -11,6 +11,7 @@ import BridgeScreen from './screens/BridgeScreen';
 import GovernanceScreen from './screens/GovernanceScreen';
 import WIFRScreen from './screens/WIFRScreen';
 import TokensScreen from './screens/TokensScreen';
+import IdentityScreen from './screens/IdentityScreen';
 import ReceiveScreen from './screens/ReceiveScreen';
 import SendScreen from './screens/SendScreen';
 import HistoryScreen from './screens/HistoryScreen';
@@ -74,6 +75,7 @@ export default function App() {
           <Stack.Screen name="History" component={HistoryScreen} />
           <Stack.Screen name="AddressBook" component={AddressBookScreen} />
           <Stack.Screen name="Tokens" component={TokensScreen} />
+          <Stack.Screen name="Identity" component={IdentityScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
