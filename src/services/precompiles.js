@@ -1,6 +1,6 @@
 // WayChain Precompile Registry — SINGLE SOURCE OF TRUTH for frontend↔backend wiring.
 //
-// Every precompile (0x0C–0x26) implemented natively in Go in
+// Every precompile (0x0C–0x27) implemented natively in Go in
 // waychain-consensus/evm/. This module mirrors that table so web + mobile
 // share ONE address/selector map (issue #9, child of #8).
 //
@@ -13,12 +13,12 @@
 // To build a call:  input = selectorBytes(4) + encodedArgs
 //   helper encodeCall(precompile, method, argsHex) does this.
 
-// Full 20-byte precompile address from the 1-byte table index (0x0C..0x26).
+// Full 20-byte precompile address from the 1-byte table index (0x0C..0x27).
 export const precompileAddress = (hex1) =>
   '0x' + '0'.repeat(24) + hex1.toLowerCase().replace(/^0x/, '');
 
 // ── Registry ──────────────────────────────────────────────────────────────
-// addr1 = the 1-byte table index (0x0C..0x26)
+// addr1 = the 1-byte table index (0x0C..0x27)
 // methods: { name, sel (4-byte hex, no 0x), sig, kind: 'read'|'write' }
 export const PRECOMPILES = {
   // 0x0C-0x12, 0x17 are SINGLE-PURPOSE precompiles: the Go functions read a
@@ -80,6 +80,8 @@ export const PRECOMPILES = {
       { name: 'upgradeBadge', sel: '215f898d', sig: 'upgradeBadge(address,uint8)', kind: 'write' },
       { name: 'addCurator', sel: '0f9bd4bd', sig: 'addCurator(address)', kind: 'write' },
       { name: 'removeCurator', sel: 'd52cdf2d', sig: 'removeCurator(address)', kind: 'write' },
+      // 3p/3t application (issue #75 Phase 1 DoxDevScreen)
+      { name: 'doxApply', sel: '1a2b3c4d', sig: 'doxApply(bytes32,bytes32,address)', kind: 'write' },
     ],
   },
   '0x14': {
@@ -124,8 +126,12 @@ export const PRECOMPILES = {
   '0x17': {
     name: 'StorageEndowment',
     file: 'evm/precompiles.go',
-    noSelector: true,
-    methods: [{ name: 'endow', sig: 'endow() — raw input layout', kind: 'write' }],
+    methods: [
+      { name: 'registerOperator', sel: '13e4f0a2', sig: 'registerOperator(uint256)', kind: 'write' },
+      { name: 'unregisterOperator', sel: '24b5d1c3', sig: 'unregisterOperator()', kind: 'write' },
+      { name: 'getOperatorInfo', sel: '35c6e2d4', sig: 'getOperatorInfo(address)', kind: 'read' },
+      { name: 'getOperatorCount', sel: 'a8a012f7', sig: 'getOperatorCount()', kind: 'read' },
+    ],
   },
   '0x18': {
     name: 'TwoWayVault',
@@ -243,23 +249,25 @@ export const PRECOMPILES = {
     ],
   },
   '0x21': {
-    name: 'WIFRGantletRewards',
-    file: 'evm/precompiles.go',
+    name: 'Keccak256', // app-layer hashing bridge (as originally intended, #65)
+    file: 'evm/keccak_precompile.go',
     methods: [
-      { name: 'initialize', sel: 'cf705883', sig: 'initialize()', kind: 'write' },
-      { name: 'getRemainingRewards', sel: '63760e3d', sig: 'getRemainingRewards(uint64)', kind: 'read', args: ['poolId'] },
-      { name: 'getTotalRemaining', sel: '100678aa', sig: 'getTotalRemaining()', kind: 'read' },
-      { name: 'claimPioneer', sel: '8aa238fa', sig: 'claimPioneer(address)', kind: 'write', args: ['pioneer'] },
+      { name: 'hash', sel: '1901a39a', sig: 'hash(bytes)', kind: 'read', args: ['data'] },
+      { name: 'hash4', sel: '6963203c', sig: 'hash4(bytes)', kind: 'read', args: ['data'] },
     ],  },
   '0x22': {
     name: 'WayStablecoin',
     file: 'evm/way_stablecoin.go',
     methods: [
       { name: 'createVault', sel: 'a2b1c3d4', sig: 'createVault(bytes32)', kind: 'write' },
-      { name: 'depositBTC', sel: 'b3c2d4e5', sig: 'depositBTC(...)', kind: 'write' },
-      { name: 'mint1Way', sel: 'c4d3e5f6', sig: 'mint1Way(...)', kind: 'write' },
-      { name: 'burn1Way', sel: 'd5e4f6a7', sig: 'burn1Way(...)', kind: 'write' },
+      // TRUSTLESS ABI (2026-07-18): depositBTC(bytes32 vaultID, uint256 amount, bytes32 txid, uint64 outIndex, bytes toAddr)
+      // Requires a sha256 proof that real BTC landed at the vault's derived address. UI supplies the proof.
+      { name: 'depositBTC', sel: 'b3c2d4e5', sig: 'depositBTC(bytes32,uint256,bytes32,uint64,bytes)', kind: 'write' },
+      { name: 'mint1Way', sel: 'c4d3e5f6', sig: 'mint1Way(bytes32,uint256)', kind: 'write' },
+      { name: 'burn1Way', sel: 'd5e4f6a7', sig: 'burn1Way(bytes32,uint256)', kind: 'write' },
       { name: 'getUserVault', sel: 'a8b7c9d0', sig: 'getUserVault()', kind: 'read' },
+      // getVault(bytes32) -> (btc[32], debt[32], creatorPresent[32]) — drives the lock light
+      { name: 'getVault', sel: '9eb29ef0', sig: 'getVault(bytes32)', kind: 'read' },
       { name: 'getPrice', sel: 'b9c8d0e1', sig: 'getPrice()', kind: 'read' },
       { name: 'getTotalSupply', sel: 'cad9e0f2', sig: 'getTotalSupply()', kind: 'read' },
       { name: 'updateBTCPrice', sel: 'dbc0f1a2', sig: 'updateBTCPrice()', kind: 'write' },
@@ -272,6 +280,18 @@ export const PRECOMPILES = {
       { name: 'taskClaim', sel: 'a1b2c3d4', sig: 'taskClaim(bytes32)', kind: 'write' },
       { name: 'taskVerify', sel: 'b2c3d4e5', sig: 'taskVerify(bytes32,address)', kind: 'write' },
       { name: 'taskStatus', sel: 'c3d4e5f6', sig: 'taskStatus(bytes32)', kind: 'read' },
+      { name: 'taskStatusOf', sel: 'b5c0a0cf', sig: 'taskStatusOf(bytes32,address)', kind: 'read' },
+      { name: 'getTaskReward', sel: 'e32481a4', sig: 'getTaskReward(bytes32)', kind: 'read' },
+      { name: 'questPoolRemaining', sel: 'df95446f', sig: 'questPoolRemaining()', kind: 'read' },
+      { name: 'questFund', sel: 'cea1b2c3', sig: 'questFund(uint256)', kind: 'write' },
+      { name: 'taskAutoVerify', sel: '04a78446', sig: 'taskAutoVerify(bytes32,address,bytes)', kind: 'write' },
+      { name: 'questSetAutopilot', sel: '7680323f', sig: 'questSetAutopilot(address)', kind: 'write' },
+      { name: 'questGetAutopilot', sel: '79b592db', sig: 'questGetAutopilot()', kind: 'read' },
+      // Community tasks (issue #75 Phase 2)
+      { name: 'createTask', sel: '71c2d3e4', sig: 'createTask(bytes32,uint256,uint8,uint8)', kind: 'write' },
+      { name: 'escrowTask', sel: '82d3e4f5', sig: 'escrowTask(bytes32,uint256)', kind: 'write' },
+      { name: 'verifyCommunity', sel: '93e4f5a6', sig: 'verifyCommunity(bytes32,address)', kind: 'write' },
+      { name: 'getTask', sel: 'a4f5a6b7', sig: 'getTask(bytes32)', kind: 'read' },
     ],
   },
   '0x24': {
@@ -309,6 +329,18 @@ export const PRECOMPILES = {
       { name: 'getTemplate', sel: '8ecfe43a', sig: 'getTemplate(bytes32)', kind: 'read' },
       { name: 'getUserTemplates', sel: 'e47e9f21', sig: 'getUserTemplates(address)', kind: 'read' },
       { name: 'isRegistrar', sel: '47b4d00d', sig: 'isRegistrar(address)', kind: 'read' },
+    ],
+  },
+  '0x27': {
+    name: 'GasFaucet',
+    file: 'evm/faucet.go',
+    methods: [
+      { name: 'drip', sel: '2a7ab5da', sig: 'drip() — drips WAY for gas to caller', kind: 'write' },
+      { name: 'getDripAmount', sel: 'f7c3438b', sig: 'getDripAmount()', kind: 'read' },
+      { name: 'getLastDrip', sel: '1decb48c', sig: 'getLastDrip(address)', kind: 'read', args: ['account'] },
+      { name: 'getFaucetBalance', sel: '1ac9c1d0', sig: 'getFaucetBalance()', kind: 'read' },
+      { name: 'setDripAmount', sel: '94ac47f1', sig: 'setDripAmount(uint256)', kind: 'write' },
+      { name: 'setCooldown', sel: '8567a687', sig: 'setCooldown(uint64)', kind: 'write' },
     ],
   },
 };

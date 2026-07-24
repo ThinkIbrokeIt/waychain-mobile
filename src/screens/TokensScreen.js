@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, Alert, ActivityIndicator
 import { COLORS, FONTS } from '../theme';
 import BrandHeader from '../components/BrandHeader';
 import Button from '../components/Button';
+import AmountField from '../components/AmountField';
 import { wallet } from '../services/wallet';
 import { waychainRPC } from '../services/rpc';
 
@@ -64,7 +65,7 @@ export default function TokensScreen({ navigation }) {
   }, []);
 
   useEffect(() => { loadAccount(); }, [loadAccount]);
-  useEffect(() => { if (account) fetchAll(account.address); }, [account, fetchAll]);
+  useEffect(() => { if (account) fetchAll(account.publicKey); }, [account, fetchAll]);
 
   const write = async (label, fn) => {
     if (!account) { Alert.alert('No wallet', 'Create or import a wallet to transact.'); return; }
@@ -72,7 +73,7 @@ export default function TokensScreen({ navigation }) {
     try {
       const res = await fn();
       Alert.alert(label + ' submitted', 'Tx: ' + ((res && res.txHash) || 'pending').slice(0, 20) + '…');
-      fetchAll(account.address);
+      fetchAll(account.publicKey);
     } catch (e) {
       Alert.alert(label + ' failed', e?.message || 'Unknown error');
     } finally {
@@ -96,7 +97,7 @@ export default function TokensScreen({ navigation }) {
     const amt = parseFloat(burnAmt);
     if (!amt || amt <= 0) { Alert.alert('Invalid amount', 'Enter a SWAY amount.'); return; }
     const wei = BigInt(Math.floor(amt * 1e18)).toString(16);
-    const args = raw20(account.address) + encodeUint256('0x' + wei);
+    const args = raw20(account.publicKey) + encodeUint256('0x' + wei);
     write('Burn SWAY', () =>
       waychainRPC.precompileCall('0x24', 'burn', args, { write: true, privHex: account.privateKey, pub64: account.publicKey }));
   };
@@ -129,8 +130,7 @@ export default function TokensScreen({ navigation }) {
         <Text style={styles.row}><Text style={styles.k}>Your balance</Text>
           <Text style={[styles.v, !swayBal && styles.unavail]}>{swayBal ? formatWay(swayBal) + ' SWAY' : (loading ? '—' : 'unavailable')}</Text></Text>
         <Text style={styles.note}>SWAY getBalance is temporarily unavailable on the public RPC (node error). burn is offered but may also error until fixed.</Text>
-        <TextInput value={burnAmt} onChangeText={setBurnAmt} placeholder="amount to burn" placeholderTextColor={COLORS.muted}
-          style={styles.input} keyboardType="decimal-pad" />
+        <AmountField label="" value={burnAmt} onChange={setBurnAmt} placeholder="0.0 SWAY" />
         <Button label={busy === 'Burn SWAY' ? 'Submitting…' : 'Burn SWAY'} onPress={burnSway} disabled={!!busy || loading} style={styles.btn} />
       </View>
 

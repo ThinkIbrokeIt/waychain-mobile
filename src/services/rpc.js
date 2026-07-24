@@ -19,17 +19,18 @@ export const hexToNum = (hex) => {
 
 // Precompile addresses — imported from the shared registry (issue #9).
 // Single source of truth: src/services/precompiles.js mirrors
-// waychain-consensus/evm/precompiles.go (0x0C–0x26).
+// waychain-consensus/evm/precompiles.go (0x0C–0x27).
 import { PRECOMPILES as REGISTRY, precompileAddress, encodeCall } from './precompiles';
 import { buildAndSignTx, getNonce, sendRawTransaction } from './tx';
 
 // Backwards-compatible named map for existing call sites.
+// NOTE: 0x21 is Keccak256 (app-layer hashing bridge) — it is NOT "WIFR".
+// WIFR is a Solana marketing token and has no WayChain precompile address.
 const PRECOMPILES = {
   BIJO:           precompileAddress('0x14'),
   TWO_WAY:        precompileAddress('0x18'),
   TRUSTLESS_LOCK: precompileAddress('0x1A'),
   GOVERNANCE:     precompileAddress('0x1D'),
-  WIFR:           precompileAddress('0x21'),
 };
 
 // ABI selectors: WayChain uses sha256(signature)[:4], NOT keccak256.
@@ -73,17 +74,31 @@ export const waychainRPC = {
     };
   },
 
-  // WayChain native balance method (per AGENTS.md RPC endpoints)
-  getBalance: async (address) => {
+  // WayChain native balance method (per AGENTS.md RPC endpoints).
+  // TRUTH-FIX 2026-07-17: the chain's way_getBalance expects the FULL 64-hex
+  // Ed25519 pubkey (EVM account key = pub64), NOT the 20-byte display address.
+  // Passing the 20-byte form returns 0x0 (latent "shows 0" outage). Callers
+  // must pass account.publicKey, which is already the 0x-prefixed 64-hex.
+  getBalance: async (addressOrAccount) => {
+    const pub64 = addressOrAccount?.publicKey || addressOrAccount;
     try {
-      const res = await waychainRPC.call('way_getBalance', [address]);
+      const res = await waychainRPC.call('way_getBalance', [pub64]);
       return res;
     } catch {
       // fallback to eth_call on BIJO precompile (sha256 selector)
-      const addrHex = address.replace(/^0x/, '').toLowerCase().padStart(64, '0');
+      const addrHex = pub64.replace(/^0x/, '').toLowerCase().padStart(64, '0');
       const data = SELECTORS.balanceOf + addrHex;
       return waychainRPC.call('eth_call', [{ to: PRECOMPILES.BIJO, data }]);
     }
+  },
+
+  // Dox_Dev badge level (0 unverified → 1 basic → 2 professional → 3p/3t governed/task).
+  // Chain RPC: way_getDoxLevel(address) returns hex level.
+  getDoxLevel: async (addressOrAccount) => {
+    const pub64 = addressOrAccount?.publicKey || addressOrAccount;
+    const res = await waychainRPC.call('way_getDoxLevel', [pub64]);
+    const n = parseInt(res, 16);
+    return Number.isFinite(n) ? n : 0;
   },
 
   getAddressFromKey: (privateKey) => {
@@ -100,7 +115,7 @@ export const waychainRPC = {
   sign,
 
   // ── Per-precompile call layer (issue #11, child of #8) ──
-  // Unified read/write entrypoint for all 27 precompiles, built on the
+  // Unified read/write entrypoint for all 28 precompiles, built on the
   // shared registry (#9) + real auth (#10) + tx pipeline (tx.js).
   //
   //   precompileCall('0x22', 'createVault', '0x'+vaultId, { write:true, privHex, pub64 })
@@ -131,6 +146,34 @@ export const waychainRPC = {
       data: hexToBytesLocal(data),
     });
     return sendRawTransaction(rawHex);
+  },
+
+  // ── Quest / TaskRegistry live reads (0x23) ──
+  // Use the way_* RPC methods (public RPC allows these; eth_call to precompiles
+  // is blocked). These make the mobile quest list reflect REAL on-chain state
+  // instead of silently showing "none".
+  questStatus: async (taskIdHex, claimantHex) => {
+    const r = await waychainRPC.call('way_taskStatus', [taskIdHex, claimantHex]);
+    return typeof r === 'string' ? r : 'none';
+  },
+  questPoolRemaining: async () => {
+    const r = await waychainRPC.call('way_questPoolRemaining', []);
+    if (!r || r === '0x' || r === '0x0') return 0;
+    try { return Number(BigInt(r.replace(/^0x/, ''))); } catch { return 0; }
+  },
+  questGetAutopilot: async () => {
+    const r = await waychainRPC.call('way_questGetAutopilot', []);
+    return typeof r === 'string' ? r : '';
+  },
+  wayTotalSupply: async () => {
+    const r = await waychainRPC.call('way_wayTotalSupply', []);
+    if (!r) return 0;
+    try { return Number(BigInt(r.replace(/^0x/, ''))); } catch { return 0; }
+  },
+  questCap: async () => {
+    const r = await waychainRPC.call('way_questCap', []);
+    if (!r) return 0;
+    try { return Number(BigInt(r.replace(/^0x/, ''))); } catch { return 0; }
   },
 };
 

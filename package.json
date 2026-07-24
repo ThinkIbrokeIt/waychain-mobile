@@ -8,7 +8,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "test": "node test/precompiles.test.mjs && node test/precompile-call.test.mjs && node test/precompile-selectors.test.mjs && node test/balance-64hex.test.mjs"
+    "test": "node scripts/check-missing-imports.mjs && node test/precompiles.test.mjs && node test/precompile-call.test.mjs && node test/precompile-selectors.test.mjs && node test/balance-64hex.test.mjs",
+    "guard": "node scripts/check-missing-imports.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",
@@ -21,11 +22,12 @@
     "@react-navigation/stack": "^7.0.0",
     "@scure/bip32": "^1.7.0",
     "@scure/bip39": "^1.6.0",
+    "bitcoinjs-lib": "^7.0.1",
     "expo": "~53.0.27",
     "expo-crypto": "~15.0.0",
     "expo-local-authentication": "^15.0.2",
+    "react-native-vision-camera": "4.6.4",
     "expo-secure-store": "~14.2.4",
-    "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.6",
     "react-native-gesture-handler": "~2.24.0",
@@ -35,6 +37,7 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-svg": "^15.15.5",
-    "react-native-web": "^0.20.0"
+    "react-native-web": "^0.20.0",
+    "react": "19.0.0"
   }
 }

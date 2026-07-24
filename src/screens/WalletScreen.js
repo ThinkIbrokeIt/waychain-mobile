@@ -17,6 +17,8 @@ export default function WalletScreen({ navigation }) {
   const [revealAddr, setRevealAddr] = useState(null);
   const [needsBackup, setNeedsBackup] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [faucetBusy, setFaucetBusy] = useState(false);
+  const [faucetMsg, setFaucetMsg] = useState(null); // { ok, text }
 
   const load = useCallback(async () => {
     const accs = await wallet.loadAccounts();
@@ -40,6 +42,31 @@ export default function WalletScreen({ navigation }) {
     setRefreshing(true);
     if (active) await refreshBalance(active.publicKey);
     setRefreshing(false);
+  }, [active, refreshBalance]);
+
+  // Faucet drip: calls GasFaucet 0x27 drip() selector (sha256("drip()")[:4] = 0x2a7ab5da).
+  // WRITE path: build + sign a tx from the active wallet and send it. The founder's
+  // first drip also fires the one-shot genesis seed (idempotent, no-op once funded).
+  const dripFaucet = useCallback(async () => {
+    if (!active?.privateKey || !active?.publicKey) {
+      setFaucetMsg({ ok: false, text: 'No active wallet to receive the drip.' });
+      return;
+    }
+    setFaucetBusy(true);
+    setFaucetMsg(null);
+    try {
+      await waychainRPC.precompileCall('0x27', 'drip', '', {
+        write: true,
+        privHex: active.privateKey,
+        pub64: active.publicKey,
+      });
+      setFaucetMsg({ ok: true, text: 'Faucet drip sent — gas WAY incoming.' });
+      await refreshBalance(active.publicKey);
+    } catch (e) {
+      setFaucetMsg({ ok: false, text: 'Drip failed: ' + (e?.message || e) });
+    } finally {
+      setFaucetBusy(false);
+    }
   }, [active, refreshBalance]);
 
   const createWallet = async () => {
@@ -137,6 +164,9 @@ export default function WalletScreen({ navigation }) {
           <TouchableOpacity onPress={() => promptImport(doImport)}>
             <Text style={styles.link}>Import existing wallet</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ScanPay', { mode: 'import', onImport: doImport })} style={{ marginTop: 12 }}>
+            <Text style={[styles.link, { color: COLORS.amber }]}>📷 QR Import</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.card}>
@@ -154,28 +184,64 @@ export default function WalletScreen({ navigation }) {
             </View>
           </View>
 
+          <TouchableOpacity style={styles.faucetBtn} onPress={dripFaucet} disabled={faucetBusy || !active}>
+            <Text style={styles.faucetBtnText}>{faucetBusy ? 'Dripping…' : '💧 Faucet Drip (gas WAY)'}</Text>
+          </TouchableOpacity>
+          {faucetMsg && (
+            <Text style={[styles.faucetMsg, { color: faucetMsg.ok ? COLORS.copper : COLORS.red }]}>{faucetMsg.text}</Text>
+          )}
+
           <Text style={styles.label}>Accounts ({accounts.length})</Text>
-          <View style={styles.chips}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
             {accounts.map((a, i) => (
               <TouchableOpacity key={a.address} style={[styles.chip, a.address === active?.address && styles.chipActive]} onPress={() => setActive(a)}>
                 <Text style={styles.chipLabel}>{a.label || ('Account ' + (i + 1))}{a.backedUp ? '  ✓' : '  ⚠'}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
 
-          <View style={styles.grid}>
-            <Button label="Receive" onPress={() => navigation.navigate('Receive', { address: active?.address })} variant="secondary" style={styles.gridBtn} />
-            <Button label="Send" onPress={goSend} variant="secondary" style={styles.gridBtn} />
-            <Button label="History" onPress={() => navigation.navigate('History')} variant="secondary" style={styles.gridBtn} />
-            <Button label="Address Book" onPress={() => navigation.navigate('AddressBook')} variant="secondary" style={styles.gridBtn} />
-            <Button label="Tokens" onPress={() => navigation.navigate('Tokens')} variant="secondary" style={styles.gridBtn} />
-            <Button label="Identity" onPress={() => navigation.navigate('Identity')} variant="secondary" style={styles.gridBtn} />
-            <Button label="Locks" onPress={() => navigation.navigate('Locks')} variant="secondary" style={styles.gridBtn} />
-            <Button label="Protocol" onPress={() => navigation.navigate('Protocol')} variant="secondary" style={styles.gridBtn} />
-          </View>
+          <Text style={styles.sectionTitle}>Wallet</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillRow}>
+            <Pill label="Receive" onPress={() => navigation.navigate('Receive', { address: active?.address })} />
+            <Pill label="Send" onPress={goSend} />
+            <Pill label="History" onPress={() => navigation.navigate('History')} />
+            <Pill label="Address Book" onPress={() => navigation.navigate('AddressBook')} />
+            <Pill label="Tokens" onPress={() => navigation.navigate('Tokens')} />
+            <Pill label="Identity" onPress={() => navigation.navigate('Identity')} />
+            <Pill label="Locks" onPress={() => navigation.navigate('Locks')} />
+            <Pill label="Protocol" onPress={() => navigation.navigate('Protocol')} />
+          </ScrollView>
+
+          <Text style={styles.sectionTitle}>Protocol Precompiles</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillRow}>
+            <Pill label="TwoWay Vault" onPress={() => navigation.navigate('TwoWayVault')} />
+            <Pill label="Swap Route" onPress={() => navigation.navigate('SwapRoute')} />
+            <Pill label="Stability Pool" onPress={() => navigation.navigate('StabilityPool')} />
+            <Pill label="Bitcoin Reg" onPress={() => navigation.navigate('BitcoinRegistry')} />
+            <Pill label="Dead Man's" onPress={() => navigation.navigate('DeadMansSwitch')} />
+            <Pill label="Account Mgr" onPress={() => navigation.navigate('AccountManager')} />
+            <Pill label="State Rent" onPress={() => navigation.navigate('StateRent')} />
+            <Pill label="Mineral Rts" onPress={() => navigation.navigate('MineralRights')} />
+            <Pill label="Templates" onPress={() => navigation.navigate('TemplateRegistry')} />
+            <Pill label="Keccak256" onPress={() => navigation.navigate('Keccak256')} />
+          </ScrollView>
+
+          <Text style={styles.sectionTitle}>Dox_Dev & Community</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillRow}>
+            <Pill label="Dox_Dev" onPress={() => navigation.navigate('DoxDev')} />
+            <Pill label="Community Tasks" onPress={() => navigation.navigate('CommunityTasks')} />
+          </ScrollView>
         </View>
       )}
     </ScrollView>
+  );
+}
+
+function Pill({ label, onPress }) {
+  return (
+    <TouchableOpacity style={styles.pill} onPress={onPress} activeOpacity={0.85}>
+      <Text style={styles.pillText}>{label}</Text>
+    </TouchableOpacity>
   );
 }
 
@@ -205,8 +271,12 @@ const styles = StyleSheet.create({
   chip: { backgroundColor: COLORS.parchment, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: COLORS.border },
   chipActive: { borderColor: COLORS.copper, backgroundColor: 'rgba(184,115,51,0.18)' },
   chipLabel: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.charcoal },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 14 },
-  gridBtn: { flex: 1, minWidth: '45%', minHeight: 42 },
+  // Horizontally scrolling pill rows (replaces the dense wrapped button grids)
+  chipRow: { flexDirection: 'row', gap: 8, paddingVertical: 4, paddingRight: 8 },
+  pillRow: { flexDirection: 'row', gap: 10, paddingVertical: 4, paddingRight: 8 },
+  pill: { backgroundColor: COLORS.parchment, borderRadius: 20, paddingVertical: 11, paddingHorizontal: 18, borderWidth: 1.5, borderColor: COLORS.copper },
+  pillText: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.copper },
+  sectionTitle: { fontFamily: FONTS.display, fontSize: 16, color: COLORS.copper, marginTop: 22, marginBottom: 6, letterSpacing: 1 },
   topActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10, paddingHorizontal: 16, marginTop: -8, marginBottom: 4 },
   iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.copper, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.copper, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   iconBtnText: { fontFamily: FONTS.bold, fontSize: 22, color: COLORS.copper, textAlign: 'center' },
@@ -214,6 +284,9 @@ const styles = StyleSheet.create({
   revealTitle: { fontFamily: FONTS.display, fontSize: 18, color: COLORS.amber, textAlign: 'center' },
   revealText: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.charcoal, marginTop: 10, lineHeight: 24 },
   revealNote: { fontFamily: FONTS.body, fontSize: 12, color: COLORS.muted, marginTop: 10 },
+  faucetBtn: { marginTop: 16, backgroundColor: COLORS.copper, borderRadius: 14, paddingVertical: 13, alignItems: 'center', shadowColor: COLORS.copper, shadowOpacity: 0.18, shadowRadius: 8, elevation: 3 },
+  faucetBtnText: { fontFamily: FONTS.bold, fontSize: 15, color: COLORS.parchment },
+  faucetMsg: { fontFamily: FONTS.medium, fontSize: 13, textAlign: 'center', marginTop: 10 },
   revealBtn: { marginTop: 12 },
   warn: { backgroundColor: 'rgba(229,57,53,0.12)', borderRadius: 10, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: COLORS.red },
   warnText: { fontFamily: FONTS.medium, fontSize: 13, color: '#FF8A80', textAlign: 'center' },
